@@ -2351,6 +2351,9 @@ static void mdss_mdp_mixer_setup(struct mdss_mdp_ctl *master_ctl,
 		return;
 	}
 
+	if (!ctl->valid_roi)
+		return;
+
 	trace_mdp_mixer_update(mixer->num);
 	pr_debug("setup mixer=%d\n", mixer->num);
 	screen_state = ctl->force_screen_state;
