@@ -5059,6 +5059,23 @@ static int is_enable_tx_possible(struct iris_device *radio)
 	return retval;
 }
 
+static bool is_initialized = false;
+static int iris_v4l2_open(struct file *file)
+{
+	int ret;
+
+	if (!is_initialized) {
+		ret = hci_fm_smd_register();
+		if (ret) {
+			FMDERR(": hci_fm_smd_register failed\n");
+			return ret;
+		}
+		is_initialized = true;
+	}
+
+	return 0;
+}
+
 static const struct v4l2_ioctl_ops iris_ioctl_ops = {
 	.vidioc_querycap              = iris_vidioc_querycap,
 	.vidioc_queryctrl             = iris_vidioc_queryctrl,
@@ -5079,6 +5096,7 @@ static const struct v4l2_file_operations iris_fops = {
 	.owner = THIS_MODULE,
 	.unlocked_ioctl = video_ioctl2,
 	.release        = iris_fops_release,
+	.open		= iris_v4l2_open,
 };
 
 static struct video_device iris_viddev_template = {
